@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambola Game</title>
+    <style>
+        .board {
+            display: flex;
+            flex-wrap: wrap;
+            width: 600px;
+        }
+
+        .number {
+            width: 60px;
+            height: 60px;
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .yellow {
+            background-color: yellow;
+        }
+
+        .ticket {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .ticket-number {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            grid-gap: 5px;
+            margin-top: 5px;
+        }
+
+        .ticket-box {
+            width: 30px;
+            height: 30px;
+            border: 1px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .yellow {
+    background-color: yellow;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Tambola Game</h1>
+    <h2>Board</h2>
+    <div class="board" id="board"></div>
+    <button onclick="callNumber()">Call Number</button>
+    <button onclick="newGame()">New Game</button>
+
+    <h2>Tickets</h2>
+    <label for="ticketCount">Number of Tickets:</label>
+    <input type="number" id="ticketCount" min="1" value="1">
+    <button onclick="generateTickets()">Generate Tickets</button>
+    <div id="tickets"></div>
+
+    <script src="script1.js"></script>
+</body>
+</html>
