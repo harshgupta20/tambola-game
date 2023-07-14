@@ -15,8 +15,7 @@ function shuffle(array) {
     return array;
 }
 
-// Generate 20 Tambola tickets with random numbers
-// Generate 20 Tambola tickets with random numbers
+// Generate 20 Tambola tickets with random numbers and empty boxes
 function generateTickets() {
     const ticketCount = parseInt(document.getElementById('ticketCount').value);
     const ticketsContainer = document.getElementById('tickets');
@@ -26,30 +25,48 @@ function generateTickets() {
         const ticket = generateTicket();
         const ticketElement = document.createElement('div');
         ticketElement.className = 'ticket';
-        ticketElement.id = `ticket-${i}`; // Assign a unique ID to each ticket
-        ticket.forEach(number => {
-            const numberElement = document.createElement('div');
-            numberElement.className = 'ticket-number';
-            numberElement.textContent = number;
+        ticketElement.id = `ticket-${i + 1}`; // Assign a unique ID to each ticket
 
-            if (calledNumbers.includes(number)) {
-                numberElement.classList.add('yellow');
+        const ticketNumberElement = document.createElement('div');
+        ticketNumberElement.className = 'ticket-number ticket-id';
+        ticketNumberElement.textContent = `Ticket ${i + 1}`;
+        ticketElement.appendChild(ticketNumberElement);
+
+        const ticketGrid = document.createElement('div');
+        ticketGrid.className = 'ticket-grid';
+
+        for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 9; col++) {
+                const boxElement = document.createElement('div');
+                boxElement.className = 'ticket-box';
+
+                if (ticket[row * 9 + col] !== null) {
+                    boxElement.textContent = ticket[row * 9 + col];
+                }
+
+                ticketGrid.appendChild(boxElement);
             }
+        }
 
-            ticketElement.appendChild(numberElement);
-        });
+        ticketElement.appendChild(ticketGrid);
         ticketsContainer.appendChild(ticketElement);
     }
 }
 
-
-// Generate a single Tambola ticket with random numbers
+// Generate a single Tambola ticket with random numbers and empty boxes
+// Generate a single Tambola ticket with random numbers and empty boxes
 function generateTicket() {
-    const ticket = [];
+    const ticket = Array.from({ length: 27 }, () => null);
     const shuffledNumbers = shuffle(numbers.slice());
 
+    // Add random numbers to the ticket
     for (let i = 0; i < 15; i++) {
-        ticket.push(shuffledNumbers[i]);
+        const emptyIndex = Math.floor(Math.random() * 27);
+        if (ticket[emptyIndex] === null) {
+            ticket[emptyIndex] = shuffledNumbers[i];
+        } else {
+            i--; // Retry if the index already has a number
+        }
     }
 
     return ticket;
@@ -57,7 +74,6 @@ function generateTicket() {
 
 let calledNumbers = [];
 
-// Call a random number and mark it as yellow on the board
 // Call a random number and mark it as yellow on the board and ticket
 // Call a random number and mark it as yellow on the board and ticket
 function callNumber() {
@@ -66,31 +82,54 @@ function callNumber() {
     const calledNumber = numbers.splice(randomIndex, 1)[0];
     calledNumbers.push(calledNumber);
 
-    const numberElement = document.createElement('div');
-    numberElement.className = 'number yellow';
-    numberElement.textContent = calledNumber;
-    board.appendChild(numberElement);
+    const numberElements = board.getElementsByClassName('number');
+    for (let i = 0; i < numberElements.length; i++) {
+        if (numberElements[i].textContent === calledNumber.toString()) {
+            numberElements[i].classList.add('yellow');
+            break;
+        }
+    }
 
     const ticketsContainer = document.getElementById('tickets');
-    const ticketElements = ticketsContainer.getElementsByClassName('ticket-number');
+    const ticketElements = ticketsContainer.getElementsByClassName('ticket-box');
     for (let i = 0; i < ticketElements.length; i++) {
         const ticketNumber = parseInt(ticketElements[i].textContent);
         if (ticketNumber === calledNumber) {
             ticketElements[i].classList.add('yellow');
-            checkWinCondition(ticketElements[i].parentElement.id); // Check winning condition for the ticket
         }
     }
+
+    checkWinCondition();
 }
 
 
 
 // Reset the game by clearing the board and called numbers
 function newGame() {
-    const board = document.getElementById('board');
-    board.innerHTML = '';
+    window.location.reload();
+}
 
-    numbers.length = 90;
-    calledNumbers = [];
+// Check if any ticket has all numbers colored and display the winning ticket ID in a popup
+function checkWinCondition() {
+    const ticketsContainer = document.getElementById('tickets');
+    const ticketElements = ticketsContainer.getElementsByClassName('ticket');
+    
+    for (let i = 0; i < ticketElements.length; i++) {
+        const ticketBoxes = ticketElements[i].getElementsByClassName('ticket-box');
+        let allColored = true;
+
+        for (let j = 0; j < ticketBoxes.length; j++) {
+            if (ticketBoxes[j].textContent !== "" && !ticketBoxes[j].classList.contains('yellow')) {
+                allColored = false;
+                break;
+            }
+        }
+
+        if (allColored) {
+            const ticketId = ticketElements[i].id;
+            alert(`Ticket ${ticketId} has won!`);
+        }
+    }
 }
 
 // Initialize the board with numbers 1 to 90
@@ -104,24 +143,3 @@ window.addEventListener('DOMContentLoaded', () => {
         board.appendChild(numberElement);
     }
 });
-
-
-
-
-// Check if all numbers on a ticket have been marked as yellow
-function checkWinCondition(ticketId) {
-    const ticketElement = document.getElementById(ticketId);
-    const ticketNumbers = ticketElement.getElementsByClassName('ticket-number');
-    let allMarked = true;
-
-    for (let i = 0; i < ticketNumbers.length; i++) {
-        if (!ticketNumbers[i].classList.contains('yellow')) {
-            allMarked = false;
-            break;
-        }
-    }
-
-    if (allMarked) {
-        alert('Player has won!');
-    }
-}
